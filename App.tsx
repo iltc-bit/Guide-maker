@@ -107,7 +107,7 @@ const App: React.FC = () => {
   };
 
   const handleShare = () => {
-    const url = window.location.href;
+    const url = window.location.origin + window.location.pathname;
     const shareText = `我剛完成一份照顧家人的指南，分享給你看照顧要點：${url}`;
     const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
     window.open(lineUrl, '_blank');
@@ -168,7 +168,7 @@ const App: React.FC = () => {
       infoStrategies.push({ title: "居家長照資源精算", desc: "主動聯繫「1966長照專線」，針對居服員、輔具租借及居家護理進行評補。利用公家補貼分擔體力工作，是您目前最優先的資訊任務。" });
       infoStrategies.push({ title: "社區支援地圖", desc: `針對 ${disease}，確認住家附近的特約藥局與復健診所。建立緊急聯絡網，當突發狀況發生時，能確保在最短時間內獲得專業支援。` });
     } else if (residence === '住院中') {
-      infoStrategies.push({ title: "出院準備導航", desc: "與醫院的「出院準備小組」密切配合，確認返家後的醫療銜接，包括居家呼吸治療或傷口護理，避免返家初期的混亂與無助。" });
+      infoStrategies.push({ title: "出院準備導航", desc: "與醫院的「出準備小組」密切配合，確認返家後的醫療銜接，包括居家呼吸治療或傷口護理，避免返家初期的混亂與無助。" });
       infoStrategies.push({ title: "病後生活重新規劃", desc: `考量 ${disease} 的病程，諮詢社工了解相關補助與院後資源。在出院前完成家中的無障礙評估，為接下來的照護階段打好基礎。` });
     } else {
       infoStrategies.push({ title: "機構溝通與互動", desc: "了解機構的服務品質監控與緊急聯繫窗口。透過規律的探視，維持您與被照顧者的親情連結，並與工作人員建立良好的協作關係。" });
@@ -205,21 +205,41 @@ const App: React.FC = () => {
   const analysis = getAnalysisData();
 
   const handleGenerateReport = () => {
-    // Send data to webhook
+    // Webhook 1: osvdwga9wtb365rj4i3v4wxp9lkjpmhy (Generation Tracking)
     fetch('https://hook.us2.make.com/osvdwga9wtb365rj4i3v4wxp9lkjpmhy', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nebulaData,
-        scores,
-        moodState,
-        submittedAt: new Date().toISOString()
+        nickname: nebulaData.nickname,
+        avatar: nebulaData.avatar,
+        pressure: nebulaData.q1,
+        disease: nebulaData.q8,
+        residence: nebulaData.q9,
+        relationship: nebulaData.q15,
+        duration: nebulaData.q16,
+        scores: scores,
+        currentMood: moodState.currentTag,
+        futureMood: moodState.futureTag,
+        timestamp: new Date().toISOString()
       }),
-    }).catch((err) => console.error('Webhook error:', err));
+    }).catch(e => console.error("Report Tracking Error:", e));
 
     navigateTo('result');
+  };
+
+  const handleConsultClick = () => {
+    // Webhook 2: xp2hobtgm7gcrrep16e0zmniox836s7w (Consult Click Tracking)
+    fetch('https://hook.us2.make.com/xp2hobtgm7gcrrep16e0zmniox836s7w', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nickname: nebulaData.nickname,
+        action: 'click_consult_button',
+        timestamp: new Date().toISOString()
+      }),
+    }).catch(e => console.error("Consult Tracking Error:", e));
+
+    setShowConsult(true);
   };
 
   const handleConsultSubmit = () => {
@@ -602,7 +622,7 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-center gap-2">
-                      <button onClick={() => setShowConsult(true)} className="w-full py-4 rounded-full text-white font-black text-lg shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all" 
+                      <button onClick={handleConsultClick} className="w-full py-4 rounded-full text-white font-black text-lg shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all" 
                         style={{ backgroundColor: brandColors.deepPink }}>
                         <MessageSquare className="w-5 h-5" />
                         預約諮詢照顧管家
