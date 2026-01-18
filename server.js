@@ -31,7 +31,10 @@ const server = http.createServer((req, res) => {
           res.end('Not Found');
           return;
         }
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.writeHead(200, { 
+          'Content-Type': 'text/html; charset=utf-8',
+          'Access-Control-Allow-Origin': '*'
+        });
         res.end(content, 'utf-8');
       });
       return;
@@ -49,7 +52,7 @@ const server = http.createServer((req, res) => {
           'Content-Type': contentType,
           'X-Content-Type-Options': 'nosniff',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'public, max-age=0'
         });
         res.end(content, 'utf-8');
       }
