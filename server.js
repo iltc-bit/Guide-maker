@@ -21,33 +21,36 @@ const server = http.createServer((req, res) => {
   let urlPath = req.url.split('?')[0];
   let filePath = urlPath === '/' ? './index.html' : '.' + urlPath;
   
+  // 檢查檔案是否存在，否則回傳 index.html 支援 SPA 路由
   const fullPath = path.resolve(__dirname, filePath);
-  const extname = String(path.extname(fullPath)).toLowerCase();
-  const contentType = MIME_TYPES[extname] || 'application/octet-stream';
-
+  
   fs.stat(fullPath, (err, stats) => {
     if (err || !stats.isFile()) {
-      fs.readFile(path.resolve(__dirname, './index.html'), (err, indexContent) => {
+      const indexPath = path.resolve(__dirname, './index.html');
+      fs.readFile(indexPath, (err, content) => {
         if (err) {
           res.writeHead(404);
           res.end('Not Found');
           return;
         }
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(indexContent, 'utf-8');
+        res.end(content, 'utf-8');
       });
       return;
     }
 
+    const extname = String(path.extname(fullPath)).toLowerCase();
+    const contentType = MIME_TYPES[extname] || 'application/octet-stream';
+
     fs.readFile(fullPath, (error, content) => {
       if (error) {
         res.writeHead(500);
-        res.end('Server Error: ' + error.code);
+        res.end('Server Error');
       } else {
         res.writeHead(200, { 
           'Content-Type': contentType,
           'X-Content-Type-Options': 'nosniff',
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
+          'Access-Control-Allow-Origin': '*'
         });
         res.end(content, 'utf-8');
       }
