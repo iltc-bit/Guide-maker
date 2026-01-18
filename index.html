@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星雲計畫 - 照護指南</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'neon-pulse': 'neon-pulse 2s infinite ease-in-out',
+            'in': 'fade-in 0.5s ease-out',
+          },
+          keyframes: {
+            'neon-pulse': {
+              '0%, 100%': { opacity: '0.9', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.03)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom styles for range slider and select that are difficult to replicate with pure Tailwind utilities */
+    .pressure-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: #ec4899;
+      border: 3px solid white;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      margin-top: -11px;
+    }
+    .pressure-slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 10px;
+      cursor: pointer;
+      background: #e5e7eb;
+      border-radius: 10px;
+    }
+    .pressure-slider:focus {
+      outline: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d98a9d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.5rem;
+    }
+    
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      body {
+        visibility: hidden;
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      #result-card {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 15mm;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      #result-card * {
+        visibility: visible;
+      }
+      .no-print {
+        display: none !important;
+      }
+      /* Hide the consult section during print if it's open, as per standard report requirements */
+      #consult-section {
+        display: none !important;
+      }
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
