@@ -27,7 +27,6 @@
     }
   </script>
   <style>
-    /* Custom styles for range slider and select that are difficult to replicate with pure Tailwind utilities */
     .pressure-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       height: 32px;
@@ -84,7 +83,6 @@
       .no-print {
         display: none !important;
       }
-      /* Hide the consult section during print if it's open, as per standard report requirements */
       #consult-section {
         display: none !important;
       }
@@ -93,11 +91,12 @@
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react": "https://esm.sh/react@19.0.0?dev",
+    "react/": "https://esm.sh/react@19.0.0/",
+    "react-dom": "https://esm.sh/react-dom@19.0.0?dev",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client?dev",
+    "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
     "lucide-react": "https://esm.sh/lucide-react@0.460.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
   }
 }
@@ -105,17 +104,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <!-- 使用 esm.sh 的 tsx 轉換器來處理瀏覽器端的 .tsx 檔案 -->
-  <script type="module">
-    import { createRoot } from 'react-dom/client';
-    import React from 'react';
-    import App from './App.tsx';
-    
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      const root = createRoot(rootElement);
-      root.render(React.createElement(React.StrictMode, null, React.createElement(App)));
-    }
-  </script>
+  <script type="module" src="https://esm.sh/run"></script>
+  <script type="text/babel" src="./index.tsx"></script>
 </body>
 </html>

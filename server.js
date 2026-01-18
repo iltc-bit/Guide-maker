@@ -20,10 +20,8 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let urlPath = req.url.split('?')[0];
   let filePath = urlPath === '/' ? './index.html' : '.' + urlPath;
-  
-  // 檢查檔案是否存在，否則回傳 index.html 支援 SPA 路由
   const fullPath = path.resolve(__dirname, filePath);
-  
+
   fs.stat(fullPath, (err, stats) => {
     if (err || !stats.isFile()) {
       const indexPath = path.resolve(__dirname, './index.html');
@@ -50,7 +48,8 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { 
           'Content-Type': contentType,
           'X-Content-Type-Options': 'nosniff',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'no-cache'
         });
         res.end(content, 'utf-8');
       }
@@ -59,5 +58,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
