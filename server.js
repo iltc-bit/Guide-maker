@@ -6,9 +6,9 @@ const PORT = process.env.PORT || 8080;
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.ts': 'text/javascript; charset=utf-8',
-  '.tsx': 'text/javascript; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.ts': 'application/javascript; charset=utf-8',
+  '.tsx': 'application/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
@@ -22,7 +22,6 @@ const server = http.createServer((req, res) => {
   let filePath = urlPath === '/' ? './index.html' : '.' + urlPath;
   let fullPath = path.resolve(__dirname, filePath);
 
-  // 檢查檔案是否存在，若不存在則回傳 index.html (SPA 支持)
   if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) {
     fullPath = path.resolve(__dirname, './index.html');
   }
