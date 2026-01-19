@@ -5,9 +5,9 @@ import {
   Share2, Download, ChevronUp, RefreshCcw, ArrowLeft, Sun 
 } from 'lucide-react';
 
-import { brandColors, cities, currentOptions, futureOptions, questions, powerCategories } from './constants';
-import { AvatarIllustration, IntroIllustration, SceneIllustration, WarmVideoIllustration } from './components/Illustrations';
-import { ConsultForm, MoodState, NebulaData } from './types';
+import { brandColors, cities, currentOptions, futureOptions, questions, powerCategories } from './constants.tsx';
+import { AvatarIllustration, IntroIllustration, SceneIllustration, WarmVideoIllustration } from './components/Illustrations.tsx';
+import { ConsultForm, MoodState, NebulaData } from './types.ts';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('intro'); 
@@ -671,105 +671,6 @@ const App: React.FC = () => {
             <button onClick={handleRestart} className="w-full mt-4 py-4 rounded-full text-base font-bold border-2 bg-white transition-all active:scale-95 no-print" style={{ borderColor: brandColors.primary, color: brandColors.primary }}>
               <RefreshCcw className="inline-block mr-2 w-4 h-4" /> 重新檢測
             </button>
-          </div>
-        )}
-
-        {currentPage === 'consult' && (
-          <div className="animate-in slide-in-from-right pb-10">
-            <div className="bg-white rounded-[32px] shadow-sm border-2 overflow-hidden flex flex-col" style={{ borderColor: brandColors.softBlue }}>
-              <header className="p-4 border-b border-gray-100 flex justify-between items-center bg-pink-50">
-                <button onClick={() => navigateTo('result')} className="p-2 hover:bg-white rounded-md transition-colors flex items-center gap-1 text-gray-400 text-sm font-medium">
-                  <ArrowLeft className="w-4 h-4" /> 離開
-                </button>
-                <h3 className="text-lg font-black text-pink-600">申請星雲計畫諮詢 (免費)</h3>
-                <div className="w-10"></div>
-              </header>
-              
-              <div className="p-6 space-y-8">
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">1. 請勾選想要諮詢的議題 (可複選)</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['身體照顧技巧', '互動溝通技巧', '心理支持資源', '社會福利補助', '照顧方式分析', '其他'].map(topic => (
-                      <button key={topic} onClick={() => toggleConsultTopic(topic)} 
-                        className={`p-3 rounded-xl border-2 text-sm font-bold transition-all ${consultForm.q2.includes(topic) ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-100 text-gray-500'}`}>
-                        {topic}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">2. 具體是遇到什麼問題或想諮詢什麼？</label>
-                  <textarea value={consultForm.q3} onChange={e => setConsultForm({...consultForm, q3: e.target.value})} placeholder="例如：想知道長照2.0怎麼申請？" className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-pink-300 min-h-[100px] text-base" />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">3. 想選擇哪一種服務方案？</label>
-                  <div className="space-y-2">
-                    {['30天四次線上視訊諮詢', '單次線上視訊諮詢', '文字訊息諮詢 (14天)'].map(plan => (
-                      <button key={plan} onClick={() => setConsultForm({...consultForm, q4: plan})} 
-                        className={`w-full text-left p-4 rounded-xl border-2 text-base font-bold transition-all ${consultForm.q4 === plan ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-100 text-gray-500'}`}>
-                        {plan}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">4. 被照顧者的民國出生年？</label>
-                  <input type="text" value={consultForm.q12} onChange={e => setConsultForm({...consultForm, q12: e.target.value})} placeholder="例如：45" className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-pink-300 text-base" />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">5. 被照顧者的生理性別？</label>
-                  <div className="flex gap-4">
-                    {['男', '女'].map(gender => (
-                      <button key={gender} onClick={() => setConsultForm({...consultForm, q13: gender})} 
-                        className={`flex-1 p-4 rounded-xl border-2 text-base font-bold transition-all ${consultForm.q13 === gender ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-100 text-gray-500'}`}>
-                        {gender}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">6. 居住的縣市？</label>
-                  <select value={consultForm.q14} onChange={e => setConsultForm({...consultForm, q14: e.target.value})} className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none appearance-none bg-white text-base focus:border-pink-300 transition-all">
-                    <option value="">請選擇縣市</option>
-                    {cities.map(city => <option key={city} value={city}>{city}</option>)}
-                  </select>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">7. 您的姓名？</label>
-                  <input type="text" value={consultForm.q17} onChange={e => setConsultForm({...consultForm, q17: e.target.value})} placeholder="請填入姓名" className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-pink-300 text-base" />
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block font-black text-gray-700">8. 您的聯絡電話？</label>
-                  <input type="tel" value={consultForm.q19} onChange={e => setConsultForm({...consultForm, q19: e.target.value})} placeholder="請務必填寫正確" className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-pink-300 text-base" />
-                </div>
-
-                <div className="space-y-3 pb-6">
-                  <label className="block font-black text-gray-700">9. 您的 Email？</label>
-                  <input type="email" value={consultForm.q20} onChange={e => setConsultForm({...consultForm, q20: e.target.value})} placeholder="請填入 Email" className="w-full p-4 rounded-xl border-2 border-gray-100 outline-none focus:border-pink-300 text-base" />
-                </div>
-
-                <footer className="pt-6 border-t border-gray-100">
-                  <button 
-                    disabled={!isConsultComplete}
-                    onClick={handleConsultSubmit} 
-                    className={`w-full py-4 rounded-full text-white font-black text-lg shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 ${isConsultComplete ? '' : 'opacity-40 grayscale'}`}
-                    style={{ backgroundColor: brandColors.deepPink }}
-                  >
-                    確認送出並回到結果頁
-                  </button>
-                  {!isConsultComplete && (
-                    <p className="text-center text-xs text-gray-400 mt-3 font-bold">請填寫完所有題目後即可送出</p>
-                  )}
-                </footer>
-              </div>
-            </div>
           </div>
         )}
       </main>
