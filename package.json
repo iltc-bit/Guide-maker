@@ -1,14 +1,12 @@
 {
   "name": "care-guideline-tool",
   "version": "1.0.0",
-  "description": "Caregiver assessment tool",
-  "main": "server.js",
+  "private": true,
   "scripts": {
     "start": "node server.js",
-    "build": "echo 'No build step required'"
+    "build": "echo 'Build skipped'"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "dependencies": {}
+  }
 }
