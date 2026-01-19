@@ -2,11 +2,12 @@
   "name": "care-guideline-tool",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "start": "node server.js",
-    "build": "echo 'Build process skipped successfully'"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "build": "echo 'Build skipped: logic is handled in-browser via Babel'"
   }
 }
