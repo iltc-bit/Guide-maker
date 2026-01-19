@@ -104,9 +104,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <!-- 使用 esm.sh/run 處理瀏覽器端編譯 -->
   <script type="module" src="https://esm.sh/run"></script>
-  <!-- 必須標記為 text/babel 並指定 data-type 為 module 以利編譯器抓取內部 import -->
-  <script type="text/babel" data-type="module" src="index.tsx"></script>
+  <script type="text/babel" data-type="module" src="/index.tsx"></script>
 </body>
 </html>
