@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "node server.js",
-    "build": "echo 'Build skipped: logic is handled in-browser via Babel'"
+    "build": "true"
   }
 }
