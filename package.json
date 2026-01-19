@@ -2,10 +2,10 @@
   "name": "care-guideline-tool",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "npm@9.0.0",
+  "packageManager": "npm@1.22.22",
   "engines": {
     "node": ">=18.0.0",
-    "npm": "9.0.0"
+    "npm": "1.22.22"
   },
   "scripts": {
     "start": "node server.js",
