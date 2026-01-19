@@ -4,43 +4,102 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>星雲計畫 - 照護指南</title>
-  
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 使用特定版本的 Babel 以確保穩定性 -->
-  <script src="https://unpkg.com/@babel/standalone@7.23.11/babel.min.js"></script>
-  
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
-          animation: { 'neon-pulse': 'neon-pulse 2s infinite ease-in-out' },
-          keyframes: { 'neon-pulse': { '0%, 100%': { opacity: '0.9', transform: 'scale(1)' }, '50%': { opacity: '1', transform: 'scale(1.03)' } } }
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'neon-pulse': 'neon-pulse 2s infinite ease-in-out',
+            'in': 'fade-in 0.5s ease-out',
+          },
+          keyframes: {
+            'neon-pulse': {
+              '0%, 100%': { opacity: '0.9', transform: 'scale(1)' },
+              '50%': { opacity: '1', transform: 'scale(1.03)' },
+            }
+          }
         }
       }
     }
   </script>
-  
   <style>
-    .pressure-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 32px; width: 32px; border-radius: 50%; background: #ec4899; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.2); cursor: pointer; margin-top: -11px; }
-    .pressure-slider::-webkit-slider-runnable-track { width: 100%; height: 10px; cursor: pointer; background: #e5e7eb; border-radius: 10px; }
-    .pressure-slider:focus { outline: none; }
-    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d98a9d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5rem; }
-    @media print { @page { size: A4; margin: 0; } body { visibility: hidden; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; } #result-card { visibility: visible; position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15mm; border: none !important; box-shadow: none !important; } #result-card * { visibility: visible; } .no-print { display: none !important; } #consult-section { display: none !important; } }
+    .pressure-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 32px;
+      width: 32px;
+      border-radius: 50%;
+      background: #ec4899;
+      border: 3px solid white;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      cursor: pointer;
+      margin-top: -11px;
+    }
+    .pressure-slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 10px;
+      cursor: pointer;
+      background: #e5e7eb;
+      border-radius: 10px;
+    }
+    .pressure-slider:focus {
+      outline: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d98a9d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.5rem;
+    }
+    
+    @media print {
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      body {
+        visibility: hidden;
+        background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      #result-card {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 15mm;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      #result-card * {
+        visibility: visible;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #consult-section {
+        display: none !important;
+      }
+    }
   </style>
-
   <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "react/jsx-runtime": "https://esm.sh/react@19.0.0/jsx-runtime",
     "lucide-react": "https://esm.sh/lucide-react@0.460.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "path": "https://esm.sh/path@^0.12.7",
     "vite": "https://esm.sh/vite@^7.3.1",
+    "path": "https://esm.sh/path@^0.12.7",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }
@@ -48,21 +107,7 @@
 </head>
 <body>
   <div id="root"></div>
-
-  <!-- 修正 type 與 data-presets 以確保 TypeScript 被正確轉換 -->
-  <script type="text/babel" data-presets="react,typescript" data-type="module">
-    import React from 'react';
-    import ReactDOM from 'react-dom/client';
-    import App from './App.tsx';
-
-    const rootElement = document.getElementById('root');
-    if (rootElement) {
-      ReactDOM.createRoot(rootElement).render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
-    }
-  </script>
+  <script type="module" src="https://esm.sh/run"></script>
+  <script type="text/babel" data-type="module" src="/index.tsx"></script>
 </body>
 </html>
