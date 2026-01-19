@@ -5,6 +5,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "mkdir -p build"
+    "build": "true"
+  },
+  "dependencies": {
+    "lucide-react": "^0.460.0"
   }
 }
