@@ -2,16 +2,8 @@
   "name": "care-guideline-tool",
   "version": "1.0.0",
   "private": true,
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "build": "echo 'No build step needed for CDN-based React app'"
-  },
-  "dependencies": {
-    "lucide-react": "^0.460.0"
+    "dev": "node server.js"
   }
 }
