@@ -14,15 +14,11 @@
     ],
     "headers": [
       {
-        "source": "**/*.@(js|ts|tsx)",
+        "source": "**/*.@(ts|tsx)",
         "headers": [
           {
             "key": "Content-Type",
             "value": "text/javascript; charset=utf-8"
-          },
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
           }
         ]
       }
