@@ -2,11 +2,9 @@
   "name": "care-guideline-tool",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "true"
   }
 }
