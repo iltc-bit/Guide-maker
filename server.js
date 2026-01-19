@@ -33,7 +33,8 @@ const server = http.createServer((req, res) => {
         }
         res.writeHead(200, { 
           'Content-Type': 'text/html; charset=utf-8',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          'X-Content-Type-Options': 'nosniff'
         });
         res.end(content, 'utf-8');
       });
@@ -52,7 +53,7 @@ const server = http.createServer((req, res) => {
           'Content-Type': contentType,
           'X-Content-Type-Options': 'nosniff',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=0'
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
         });
         res.end(content, 'utf-8');
       }
@@ -61,5 +62,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
