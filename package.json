@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build": "true"
+    "build": "echo 'No build step needed for CDN-based React app'"
   },
   "dependencies": {
     "lucide-react": "^0.460.0"
