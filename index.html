@@ -22,15 +22,12 @@
     }
   </script>
   <style>
-    .pressure-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 32px; width: 32px; border-radius: 50%; background: #ec4899; border: 3px solid white; box-shadow: 0 3px 6px rgba(0,0,0,0.2); cursor: pointer; margin-top: -11px; }
-    .pressure-slider::-webkit-slider-runnable-track { width: 100%; height: 10px; cursor: pointer; background: #e5e7eb; border-radius: 10px; }
-    .pressure-slider:focus { outline: none; }
-    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d98a9d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5rem; }
+    .pressure-slider { -webkit-appearance: none; width: 100%; height: 10px; background: #e5e7eb; border-radius: 5px; outline: none; }
+    .pressure-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #ec4899; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     @media print { 
-      @page { size: A4; margin: 0; } 
-      body { visibility: hidden; background: white; } 
-      #result-card { visibility: visible; position: absolute; left: 0; top: 0; width: 100%; margin: 0; border: none !important; box-shadow: none !important; } 
+      body { background: white; } 
       .no-print { display: none !important; } 
+      #result-card { border: none !important; box-shadow: none !important; }
     }
   </style>
   <script type="importmap">
@@ -44,24 +41,23 @@
   }
 }
 </script>
+  <!-- Babel 必須在加載後轉譯 -->
   <script src="https://unpkg.com/@babel/standalone@7.26.2/babel.min.js"></script>
 </head>
 <body class="bg-[#fffafb]">
   <div id="root"></div>
   
   <script type="text/babel" data-type="module" data-presets="typescript,react">
-    import React, { useState, useEffect, useMemo } from 'react';
+    import React, { useState, useMemo } from 'react';
     import ReactDOM from 'react-dom/client';
     import { 
       Heart, Users, Calendar, ShieldCheck, BookOpen, Activity, ArrowRight, 
-      ChevronDown, CheckCircle2, Lock, MessageSquare, Star, ChevronRight, 
-      Share2, Download, ChevronUp, RefreshCcw, ArrowLeft, Sun 
+      MessageSquare, Lock, Star, ChevronRight, RefreshCcw, Download
     } from 'lucide-react';
 
-    // --- 樣式與常數 ---
     const brandColors = {
       primary: '#ecacbc', secondary: '#a7d4e0', success: '#9bcba6',
-      accent: '#f3f0b8', softBlue: '#d2e8f1', softPink: '#f4d0da', deepPink: '#d98a9d'
+      softPink: '#f4d0da', deepPink: '#d98a9d'
     };
 
     const questions = [
@@ -73,54 +69,29 @@
       { id: 6, text: '在面臨醫療選擇或治療方案時，我能清楚衡量利弊並做出合適的決定。', icon: <Activity size={20} /> }
     ];
 
-    const currentOptions = [
-      { title: '體力透支', desc: '長期疲累身心已達極限', moodLabel: '沉重' },
-      { title: '孤軍奮戰', desc: '獨自支撐缺乏分擔對象', moodLabel: '孤寂' },
-      { title: '資訊焦慮', desc: '知識雜亂找不到正確方向', moodLabel: '迷惘' },
-      { title: '決策重擔', desc: '面對重大選擇壓力極大', moodLabel: '緊繃' },
-      { title: '失去生活', desc: '被照顧填滿沒了自我未來', moodLabel: '壓抑' }
-    ];
-
-    const futureOptions = [
-      { title: '掌控現狀', desc: '掌控病況應對不再慌亂', moodLabel: '安穩' },
-      { title: '靈活調度', desc: '善用資源建立支援系統', moodLabel: '輕盈' },
-      { title: '適度喘息', desc: '定期留白休息沒有罪惡', moodLabel: '自在' },
-      { title: '溝通和諧', desc: '互動順暢減少對立衝突', moodLabel: '溫慢' },
-      { title: '生活平衡', desc: '照顧與工作兼顧生活不脫軌', moodLabel: '和諧' }
-    ];
-
-    // --- 圖標組件 ---
     const Avatar = ({ type, selected }) => {
       const colors = { female: '#FFEDF2', neutral: '#E0F2FE', male: '#ECFDF5' };
       const border = { female: '#F472B6', neutral: '#38BDF8', male: '#10B981' };
       return (
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${selected ? 'ring-4' : 'opacity-60'}`} 
+        <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${selected ? 'ring-4' : 'opacity-40 grayscale'}`} 
              style={{ backgroundColor: colors[type] || '#eee', ringColor: border[type] }}>
-          {type === 'female' ? <Heart size={32} color="#F472B6" /> : type === 'male' ? <Activity size={32} color="#10B981" /> : <Users size={32} color="#38BDF8" />}
+          {type === 'female' ? <Heart size={28} color="#F472B6" /> : type === 'male' ? <Activity size={28} color="#10B981" /> : <Users size={28} color="#38BDF8" />}
         </div>
       );
     };
 
-    // --- 主程式 ---
     const App = () => {
       const [currentPage, setCurrentPage] = useState('intro');
       const [scores, setScores] = useState({});
-      const [nebulaData, setNebulaData] = useState({ q1: 5, q8: '', q9: '', q15: '', q16: '', nickname: '', avatar: 'female' });
-      const [mood, setMood] = useState({ current: null, future: null });
+      const [nebulaData, setNebulaData] = useState({ q1: 5, q8: '', nickname: '', avatar: 'female' });
       const [showConsult, setShowConsult] = useState(false);
 
       const isAssessmentComplete = useMemo(() => Object.keys(scores).length === questions.length, [scores]);
 
-      const getRisk = (score) => {
-        if (score <= 3) return { label: '高風險', color: '#ef4444', bg: '#fee2e2' };
-        if (score <= 7) return { label: '中風險', color: '#f59e0b', bg: '#fef3c7' };
-        return { label: '低風險', color: '#10b981', bg: '#d1fae5' };
-      };
-
       const handleRestart = () => {
         setScores({});
-        setMood({ current: null, future: null });
         setCurrentPage('intro');
+        setShowConsult(false);
       };
 
       return (
@@ -131,15 +102,15 @@
 
           <main className="max-w-md mx-auto px-4 pt-20">
             {currentPage === 'intro' && (
-              <div className="text-center space-y-8 animate-in">
+              <div className="text-center space-y-8 animate-in mt-10">
                 <div className="bg-white p-10 rounded-[40px] shadow-xl border-b-8 border-pink-100">
                   <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Heart className="text-pink-400" size={40} />
                   </div>
-                  <h2 className="text-2xl font-black text-gray-800 mb-2">照顧不孤單</h2>
-                  <p className="text-gray-500 font-medium">給自己的安心指引，共享給家人的照顧要點</p>
+                  <h2 className="text-2xl font-black text-gray-800 mb-2">照顧不再孤軍奮戰</h2>
+                  <p className="text-gray-500 font-medium leading-relaxed">這是一份給照顧者的專屬導航<br/>協助您理清思緒，找回生活節奏</p>
                   <button onClick={() => setCurrentPage('assessment')} className="w-full mt-10 py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg active:scale-95 transition-all">
-                    立即開始分析
+                    立即開始自評
                   </button>
                 </div>
               </div>
@@ -147,14 +118,17 @@
 
             {currentPage === 'assessment' && (
               <div className="space-y-4 animate-in">
-                <h3 className="text-center font-black text-gray-500 mb-4">照顧三力自評 (1-5分)</h3>
+                <div className="text-center mb-6">
+                  <h3 className="font-black text-gray-800 text-lg">照護三力評析</h3>
+                  <p className="text-sm text-gray-400 font-bold">1 分：完全不符合 ｜ 5 分：非常符合</p>
+                </div>
                 {questions.map(q => (
-                  <div key={q.id} className="bg-white p-5 rounded-3xl border-2 border-pink-50">
+                  <div key={q.id} className="bg-white p-5 rounded-3xl border-2 border-pink-50 shadow-sm">
                     <p className="font-bold text-gray-700 mb-4 leading-tight">{q.text}</p>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       {[1, 2, 3, 4, 5].map(n => (
                         <button key={n} onClick={() => setScores({...scores, [q.id]: n})} 
-                          className={`w-12 h-12 rounded-full font-bold transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110 shadow-md' : 'bg-gray-50 text-gray-400'}`}>
+                          className={`w-11 h-11 rounded-full font-bold transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110' : 'bg-gray-50 text-gray-400'}`}>
                           {n}
                         </button>
                       ))}
@@ -163,26 +137,26 @@
                 ))}
                 <button disabled={!isAssessmentComplete} onClick={() => setCurrentPage('nebula')} 
                   className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg mt-6 disabled:opacity-50">
-                  下一頁
+                  下一步
                 </button>
               </div>
             )}
 
             {currentPage === 'nebula' && (
               <div className="space-y-6 animate-in">
-                <div className="bg-white p-6 rounded-[32px] shadow-lg border-2 border-pink-50">
-                  <h3 className="font-black text-lg mb-6 text-center text-pink-600">填寫照護基礎資料</h3>
-                  <div className="space-y-4">
+                <div className="bg-white p-8 rounded-[32px] shadow-lg border-2 border-pink-50">
+                  <h3 className="font-black text-lg mb-8 text-center text-pink-600">基本資料設定</h3>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-black text-gray-500 mb-2">現在壓力指數 ({nebulaData.q1})</label>
-                      <input type="range" min="1" max="10" value={nebulaData.q1} onChange={e => setNebulaData({...nebulaData, q1: parseInt(e.target.value)})} className="pressure-slider w-full" />
+                      <label className="block text-sm font-black text-gray-400 mb-4 uppercase tracking-wider">目前壓力指數 ({nebulaData.q1})</label>
+                      <input type="range" min="1" max="10" value={nebulaData.q1} onChange={e => setNebulaData({...nebulaData, q1: parseInt(e.target.value)})} className="pressure-slider" />
                     </div>
-                    <select value={nebulaData.q8} onChange={e => setNebulaData({...nebulaData, q8: e.target.value})} className="w-full p-4 rounded-xl border-2 bg-white font-bold outline-none">
+                    <select value={nebulaData.q8} onChange={e => setNebulaData({...nebulaData, q8: e.target.value})} className="w-full p-4 rounded-xl border-2 bg-gray-50 font-bold focus:border-pink-300 outline-none">
                       <option value="">主要疾病狀況</option>
-                      {['失智症', '中風', '糖尿病', '老化衰弱', '癌症'].map(d => <option key={d} value={d}>{d}</option>)}
+                      {['失智症', '中風', '癌症', '老化衰弱', '其他'].map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
-                    <input type="text" placeholder="您的暱稱" value={nebulaData.nickname} onChange={e => setNebulaData({...nebulaData, nickname: e.target.value})} className="w-full p-4 rounded-xl border-2 font-bold" />
-                    <div className="flex justify-around pt-4">
+                    <input type="text" placeholder="您的暱稱" value={nebulaData.nickname} onChange={e => setNebulaData({...nebulaData, nickname: e.target.value})} className="w-full p-4 rounded-xl border-2 bg-gray-50 font-bold focus:border-pink-300 outline-none" />
+                    <div className="flex justify-around pt-6 border-t border-dashed">
                       {['female', 'neutral', 'male'].map(a => (
                         <button key={a} onClick={() => setNebulaData({...nebulaData, avatar: a})}><Avatar type={a} selected={nebulaData.avatar === a} /></button>
                       ))}
@@ -190,7 +164,7 @@
                   </div>
                 </div>
                 <button disabled={!nebulaData.nickname || !nebulaData.q8} onClick={() => setCurrentPage('result')} className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg">
-                  生成我的照顧報告
+                  查看分析報告
                 </button>
               </div>
             )}
@@ -199,39 +173,48 @@
               <div className="animate-in pb-10">
                 <div id="result-card" className="bg-white p-8 rounded-[40px] shadow-2xl border-2 border-pink-50">
                   <div className="text-center mb-8">
-                    <Avatar type={nebulaData.avatar} selected={true} />
-                    <h2 className="text-2xl font-black mt-4">{nebulaData.nickname} 的照顧報告</h2>
-                    <p className="text-sm font-bold text-gray-400">疾病：{nebulaData.q8} | 壓力：{nebulaData.q1}/10</p>
+                    <div className="inline-block p-1 rounded-full bg-pink-50 mb-4">
+                      <Avatar type={nebulaData.avatar} selected={true} />
+                    </div>
+                    <h2 className="text-2xl font-black">{nebulaData.nickname} 的照顧指南</h2>
+                    <p className="text-sm font-bold text-gray-400 mt-1">針對 {nebulaData.q8} 的照護建議</p>
                   </div>
 
-                  <div className="space-y-8">
-                    {/* 分析卡片範例：支持力 */}
-                    <div className="p-5 bg-pink-50 rounded-3xl">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-black text-pink-600 flex items-center gap-2"><Heart size={18}/> 支持力分析</h4>
-                        <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ backgroundColor: getRisk(scores[1]+scores[2]).bg, color: getRisk(scores[1]+scores[2]).color }}>{getRisk(scores[1]+scores[2]).label}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">目前您在尋求支援與自我調節間需要更好的平衡。針對{nebulaData.q8}的長期照護，建議您建立具體的求助清單，讓身邊的人知道如何幫忙。</p>
+                  <div className="space-y-6">
+                    <div className="p-6 bg-pink-50 rounded-3xl border-l-8 border-pink-400">
+                      <h4 className="font-black text-pink-600 mb-2 flex items-center gap-2 underline decoration-pink-200 decoration-4">核心觀察</h4>
+                      <p className="text-sm text-gray-700 leading-relaxed font-medium">目前您的壓力指數為 {nebulaData.q1} 分。在面對 {nebulaData.q8} 的過程中，覺察自己的極限是最重要的第一步。這份報告顯示您具備基礎的知識力，但在支持系統的建立上仍有進步空間。</p>
                     </div>
 
-                    <div className="bg-slate-50 p-6 rounded-3xl border-2 border-dashed border-slate-200 text-center">
-                      <Lock className="mx-auto mb-3 text-slate-400" />
-                      <p className="font-black text-slate-600 mb-4">解鎖更多個人化對策</p>
-                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-pink-500 text-white rounded-full font-black flex items-center justify-center gap-2">
+                    <div className="p-6 bg-blue-50 rounded-3xl border-l-8 border-blue-400">
+                      <h4 className="font-black text-blue-600 mb-2">專屬對策</h4>
+                      <ul className="text-sm text-gray-600 space-y-3 font-medium">
+                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0"/> 建立「具體求助清單」，讓家人知道如何分擔。</li>
+                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0"/> 善用長照 1966 專線，媒合喘息服務。</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-slate-800 p-8 rounded-[32px] text-center text-white shadow-xl no-print">
+                      <Star className="mx-auto mb-4 text-yellow-400 fill-yellow-400" />
+                      <p className="font-black text-lg mb-6 leading-tight">想與專家聊聊<br/>您的具體照護困境嗎？</p>
+                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-white text-slate-800 rounded-full font-black flex items-center justify-center gap-2 hover:bg-pink-50 transition-colors">
                         <MessageSquare size={18} /> 預約照顧管家諮詢
                       </button>
                     </div>
                   </div>
 
-                  <div className="mt-8 pt-8 border-t border-gray-100 no-print flex gap-3">
-                    <button onClick={handleRestart} className="flex-1 py-4 border-2 border-pink-500 text-pink-500 rounded-full font-black">重新檢測</button>
-                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-800 text-white rounded-full font-black">下載 PDF</button>
+                  <div className="mt-10 pt-8 border-t border-gray-100 no-print flex gap-3">
+                    <button onClick={handleRestart} className="flex-1 py-4 border-2 border-pink-500 text-pink-500 rounded-full font-black text-sm">重新檢測</button>
+                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-full font-black text-sm flex items-center justify-center gap-2"><Download size={16}/> 下載 PDF</button>
                   </div>
                 </div>
 
                 {showConsult && (
-                  <div className="mt-10 animate-in">
-                    <iframe src="https://www.surveycake.com/s/P8Aza" className="w-full h-[600px] rounded-[32px] border-4 border-pink-50 shadow-inner" />
+                  <div className="mt-10 animate-in no-print">
+                    <div className="bg-pink-50 p-4 rounded-t-[32px] text-center">
+                      <p className="text-xs font-black text-pink-400">正在加載諮詢表單...</p>
+                    </div>
+                    <iframe src="https://www.surveycake.com/s/P8Aza" className="w-full h-[600px] rounded-b-[32px] border-4 border-pink-50 shadow-inner" />
                   </div>
                 )}
               </div>
