@@ -22,6 +22,7 @@ const server = http.createServer((req, res) => {
   let filePath = urlPath === '/' ? './index.html' : '.' + urlPath;
   let fullPath = path.resolve(__dirname, filePath);
 
+  // 如果請求的文件不存在，則返回 index.html (處理 SPA 路由)
   if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) {
     fullPath = path.resolve(__dirname, './index.html');
   }
@@ -37,7 +38,8 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 
         'Content-Type': contentType,
         'X-Content-Type-Options': 'nosniff',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache'
       });
       res.end(content, 'utf-8');
     }
