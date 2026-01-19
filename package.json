@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
-    "build": "echo 'Build process skipped'"
+    "build": "echo 'Build process skipped successfully'"
   },
   "engines": {
     "node": ">=18.0.0"
