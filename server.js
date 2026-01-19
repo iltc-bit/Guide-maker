@@ -20,44 +20,28 @@ const MIME_TYPES = {
 const server = http.createServer((req, res) => {
   let urlPath = req.url.split('?')[0];
   let filePath = urlPath === '/' ? './index.html' : '.' + urlPath;
-  const fullPath = path.resolve(__dirname, filePath);
+  let fullPath = path.resolve(__dirname, filePath);
 
-  fs.stat(fullPath, (err, stats) => {
-    if (err || !stats.isFile()) {
-      const indexPath = path.resolve(__dirname, './index.html');
-      fs.readFile(indexPath, (err, content) => {
-        if (err) {
-          res.writeHead(404);
-          res.end('Not Found');
-          return;
-        }
-        res.writeHead(200, { 
-          'Content-Type': 'text/html; charset=utf-8',
-          'Access-Control-Allow-Origin': '*',
-          'X-Content-Type-Options': 'nosniff'
-        });
-        res.end(content, 'utf-8');
+  // 檢查檔案是否存在，若不存在則回傳 index.html (SPA 支持)
+  if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isFile()) {
+    fullPath = path.resolve(__dirname, './index.html');
+  }
+
+  const extname = String(path.extname(fullPath)).toLowerCase();
+  const contentType = MIME_TYPES[extname] || 'application/octet-stream';
+
+  fs.readFile(fullPath, (error, content) => {
+    if (error) {
+      res.writeHead(500);
+      res.end('Server Error');
+    } else {
+      res.writeHead(200, { 
+        'Content-Type': contentType,
+        'X-Content-Type-Options': 'nosniff',
+        'Access-Control-Allow-Origin': '*'
       });
-      return;
+      res.end(content, 'utf-8');
     }
-
-    const extname = String(path.extname(fullPath)).toLowerCase();
-    const contentType = MIME_TYPES[extname] || 'application/octet-stream';
-
-    fs.readFile(fullPath, (error, content) => {
-      if (error) {
-        res.writeHead(500);
-        res.end('Server Error');
-      } else {
-        res.writeHead(200, { 
-          'Content-Type': contentType,
-          'X-Content-Type-Options': 'nosniff',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-cache, no-store, must-revalidate'
-        });
-        res.end(content, 'utf-8');
-      }
-    });
   });
 });
 
