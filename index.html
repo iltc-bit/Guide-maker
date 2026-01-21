@@ -32,7 +32,7 @@
     @media print { .no-print { display: none !important; } #result-card { border: none !important; box-shadow: none !important; margin: 0; } }
   </style>
 
-  <!-- 修正後的 Import Map (刪除重複與衝突項) -->
+  <!-- 修正後的 Import Map：移除導致 SyntaxError 的重複映射 -->
   <script type="importmap">
 {
   "imports": {
@@ -60,7 +60,6 @@
       ArrowRight, MessageSquare, Lock, Star, ChevronRight, Download, RefreshCcw 
     } from 'lucide-react';
 
-    // --- 常數定義 ---
     const brandColors = { primary: '#ecacbc', secondary: '#a7d4e0', success: '#9bcba6', deepPink: '#d98a9d' };
     
     const questions = [
@@ -72,12 +71,11 @@
       { id: 6, text: '面臨醫療選擇時，我能清楚衡量利弊並做出合適的決定。', icon: <Activity size={20} /> }
     ];
 
-    // --- 組件 ---
     const Avatar = ({ type, selected }) => {
       const colors = { female: '#FFEDF2', neutral: '#E0F2FE', male: '#ECFDF5' };
       const icons = { female: <Heart size={32} color="#F472B6" />, neutral: <Users size={32} color="#38BDF8" />, male: <Activity size={32} color="#10B981" /> };
       return (
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${selected ? 'ring-4 ring-pink-400 scale-110' : 'opacity-40 grayscale'}`} 
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${selected ? 'ring-4 ring-pink-400 scale-110 shadow-lg' : 'opacity-40 grayscale'}`} 
              style={{ backgroundColor: colors[type] }}>
           {icons[type]}
         </div>
@@ -100,9 +98,8 @@
 
       return (
         <div className="min-h-screen font-sans">
-          {/* Header */}
           <header className="fixed top-0 inset-x-0 h-16 bg-white shadow-sm flex items-center justify-center z-50">
-             <img src="https://www.ilong-termcare.com/uploads/photos/shares/articles-content/%E6%98%9F%E9%9B%B2%E8%A8%88%E7%95%ABLOGO.png" className="h-8" alt="Logo" />
+             <span className="text-xl font-black text-pink-500 tracking-tighter">星雲計畫 | 照護指南</span>
           </header>
 
           <main className="max-w-md mx-auto px-5 pt-24 pb-10">
@@ -112,7 +109,7 @@
                   <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-8 animate-float">
                     <Heart className="text-pink-400" size={48} />
                   </div>
-                  <h1 className="text-3xl font-black text-gray-800 mb-4">照顧指南速成工具</h1>
+                  <h1 className="text-3xl font-black text-gray-800 mb-4 tracking-tight">照顧指南速成工具</h1>
                   <p className="text-gray-500 font-bold leading-relaxed">給自己的安心指引<br/>找回生活平衡的專屬報告</p>
                   <button onClick={() => setStep('quiz')} className="w-full mt-10 py-5 bg-pink-500 text-white rounded-full font-black text-xl shadow-lg active:scale-95 transition-all">
                     開始分析
@@ -123,14 +120,14 @@
 
             {step === 'quiz' && (
               <div className="space-y-4 animate-in">
-                <h2 className="text-center font-black text-gray-400 mb-6 uppercase tracking-widest">照護三力自評</h2>
+                <h2 className="text-center font-black text-pink-400 mb-6 uppercase tracking-widest">照護三力自評</h2>
                 {questions.map(q => (
-                  <div key={q.id} className="bg-white p-6 rounded-3xl border-2 border-pink-50 shadow-sm">
-                    <p className="font-bold text-gray-700 mb-6 text-lg">{q.text}</p>
+                  <div key={q.id} className="bg-white p-6 rounded-3xl border-2 border-pink-50 shadow-sm hover:border-pink-200 transition-colors">
+                    <p className="font-bold text-gray-700 mb-6 text-lg leading-tight">{q.text}</p>
                     <div className="flex justify-between items-center">
                       {[1, 2, 3, 4, 5].map(n => (
                         <button key={n} onClick={() => setScores({...scores, [q.id]: n})} 
-                          className={`w-12 h-12 rounded-full font-black transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110 shadow-md' : 'bg-gray-50 text-gray-300'}`}>
+                          className={`w-12 h-12 rounded-full font-black transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110 shadow-md' : 'bg-gray-50 text-gray-300 hover:bg-pink-50'}`}>
                           {n}
                         </button>
                       ))}
@@ -153,7 +150,7 @@
                       <input type="range" min="1" max="10" value={data.pressure} onChange={e => setData({...data, pressure: parseInt(e.target.value)})} className="pressure-slider" />
                     </div>
                     <select value={data.disease} onChange={e => setData({...data, disease: e.target.value})} className="w-full p-4 rounded-2xl border-2 bg-gray-50 font-bold outline-none focus:border-pink-300">
-                      <option value="">主要疾病狀況</option>
+                      <option value="">選擇主要疾病狀況</option>
                       {['失智症', '中風', '糖尿病', '老化衰弱', '癌症'].map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
                     <input type="text" placeholder="您的暱稱" value={data.nickname} onChange={e => setData({...data, nickname: e.target.value})} className="w-full p-4 rounded-2xl border-2 bg-gray-50 font-bold outline-none focus:border-pink-300" />
@@ -181,14 +178,17 @@
 
                   <div className="space-y-6">
                     <div className="p-6 bg-pink-50 rounded-3xl border-l-8 border-pink-400">
-                      <h3 className="font-black text-pink-600 mb-2">重點分析</h3>
-                      <p className="text-sm text-gray-700 leading-relaxed font-medium">針對您目前面對 {data.disease} 的壓力狀況，建議建立「清單式求助」。在支持力部分，您目前的表現反映出需要更多的喘息機會。這份報告已為您初步鎖定資源對策。</p>
+                      <h3 className="font-black text-pink-600 mb-2">重點分析報告</h3>
+                      <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                        親愛的 {data.nickname}，針對您目前面對 {data.disease} 的壓力狀況，建議建立「清單式求助」。
+                        在支持力部分，您目前的表現反映出需要更多的喘息機會。這份報告已為您初步鎖定資源對策。
+                      </p>
                     </div>
 
-                    <div className="bg-slate-900 p-8 rounded-[40px] text-center text-white no-print">
+                    <div className="bg-slate-900 p-8 rounded-[40px] text-center text-white no-print shadow-xl">
                       <Star className="mx-auto mb-4 text-yellow-400 fill-yellow-400" />
                       <p className="font-black text-lg mb-6 leading-tight">解鎖專屬您的<br/>具體行動方案</p>
-                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-white text-slate-900 rounded-full font-black flex items-center justify-center gap-2">
+                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-white text-slate-900 rounded-full font-black flex items-center justify-center gap-2 hover:bg-pink-50 transition-colors">
                         <MessageSquare size={18} /> 預約照顧管家諮詢
                       </button>
                     </div>
@@ -196,7 +196,9 @@
 
                   <div className="mt-10 pt-8 border-t border-gray-100 no-print flex gap-4">
                     <button onClick={handleRestart} className="flex-1 py-4 border-2 border-pink-500 text-pink-500 rounded-full font-black text-sm">重新檢測</button>
-                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-full font-black text-sm flex items-center justify-center gap-2"><Download size={16}/> 下載報告</button>
+                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-full font-black text-sm flex items-center justify-center gap-2">
+                      <Download size={16}/> 下載報告
+                    </button>
                   </div>
                 </div>
 
