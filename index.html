@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>星雲計畫 - 照護指南</title>
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -11,25 +13,26 @@
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
           animation: { 
-            'neon-pulse': 'neon-pulse 2s infinite ease-in-out',
-            'in': 'fade-in 0.3s ease-out'
+            'in': 'fade-in 0.4s ease-out',
+            'float': 'float 3s ease-in-out infinite'
           },
           keyframes: { 
-            'neon-pulse': { '0%, 100%': { opacity: '0.9', transform: 'scale(1)' }, '50%': { opacity: '1', transform: 'scale(1.03)' } } 
+            'fade-in': { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            'float': { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
           }
         }
       }
     }
   </script>
+
   <style>
-    .pressure-slider { -webkit-appearance: none; width: 100%; height: 10px; background: #e5e7eb; border-radius: 5px; outline: none; }
-    .pressure-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #ec4899; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    @media print { 
-      body { background: white; } 
-      .no-print { display: none !important; } 
-      #result-card { border: none !important; box-shadow: none !important; }
-    }
+    body { background-color: #fffafb; }
+    .pressure-slider { -webkit-appearance: none; width: 100%; height: 8px; background: #fee2e2; border-radius: 10px; outline: none; }
+    .pressure-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; border-radius: 50%; background: #ec4899; cursor: pointer; border: 4px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    @media print { .no-print { display: none !important; } #result-card { border: none !important; box-shadow: none !important; margin: 0; } }
   </style>
+
+  <!-- 修正後的 Import Map (刪除重複與衝突項) -->
   <script type="importmap">
 {
   "imports": {
@@ -41,179 +44,165 @@
   }
 }
 </script>
-  <!-- Babel 必須在加載後轉譯 -->
+
+  <!-- Babel Standalone -->
   <script src="https://unpkg.com/@babel/standalone@7.26.2/babel.min.js"></script>
 </head>
-<body class="bg-[#fffafb]">
+<body>
   <div id="root"></div>
-  
-  <script type="text/babel" data-type="module" data-presets="typescript,react">
-    import React, { useState, useMemo } from 'react';
+
+  <!-- 使用 data-type="module" 確保 ESM 支援 -->
+  <script type="text/babel" data-type="module">
+    import React, { useState, useMemo, useEffect } from 'react';
     import ReactDOM from 'react-dom/client';
     import { 
-      Heart, Users, Calendar, ShieldCheck, BookOpen, Activity, ArrowRight, 
-      MessageSquare, Lock, Star, ChevronRight, RefreshCcw, Download
+      Heart, Users, Calendar, ShieldCheck, BookOpen, Activity, 
+      ArrowRight, MessageSquare, Lock, Star, ChevronRight, Download, RefreshCcw 
     } from 'lucide-react';
 
-    const brandColors = {
-      primary: '#ecacbc', secondary: '#a7d4e0', success: '#9bcba6',
-      softPink: '#f4d0da', deepPink: '#d98a9d'
-    };
-
+    // --- 常數定義 ---
+    const brandColors = { primary: '#ecacbc', secondary: '#a7d4e0', success: '#9bcba6', deepPink: '#d98a9d' };
+    
     const questions = [
-      { id: 1, text: '我能覺察自己的情緒極限，並在體力或精神透支前主動尋求喘息。', icon: <Heart size={20} /> },
-      { id: 2, text: '我能讓周邊的人準確理解我的處境，避免因照顧問題產生衝突或孤立。', icon: <Users size={20} /> },
-      { id: 3, text: '我能有效整合政府或民間各項資源，建立穩定的日常支援系統。', icon: <Calendar size={20} /> },
-      { id: 4, text: '我對日常照顧流程有明確規劃，即使發生突發狀況也知道如何處理。', icon: <ShieldCheck size={20} /> },
-      { id: 5, text: '我掌握被照顧者疾病的關鍵知識，能準確判斷其生理或行為變化的情況。', icon: <BookOpen size={20} /> },
-      { id: 6, text: '在面臨醫療選擇或治療方案時，我能清楚衡量利弊並做出合適的決定。', icon: <Activity size={20} /> }
+      { id: 1, text: '我能覺察自己的情緒極限，並在透支前主動尋求喘息。', icon: <Heart size={20} /> },
+      { id: 2, text: '我能讓周邊的人準確理解我的處境，避免因溝通產生衝突。', icon: <Users size={20} /> },
+      { id: 3, text: '我能有效整合政府或民間資源，建立穩定的支援系統。', icon: <Calendar size={20} /> },
+      { id: 4, text: '我對照護流程有明確規劃，發生突發狀況也知道如何處理。', icon: <ShieldCheck size={20} /> },
+      { id: 5, text: '我掌握被照顧者疾病的關鍵知識，能準確判斷生理變化。', icon: <BookOpen size={20} /> },
+      { id: 6, text: '面臨醫療選擇時，我能清楚衡量利弊並做出合適的決定。', icon: <Activity size={20} /> }
     ];
 
+    // --- 組件 ---
     const Avatar = ({ type, selected }) => {
       const colors = { female: '#FFEDF2', neutral: '#E0F2FE', male: '#ECFDF5' };
-      const border = { female: '#F472B6', neutral: '#38BDF8', male: '#10B981' };
+      const icons = { female: <Heart size={32} color="#F472B6" />, neutral: <Users size={32} color="#38BDF8" />, male: <Activity size={32} color="#10B981" /> };
       return (
-        <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all ${selected ? 'ring-4' : 'opacity-40 grayscale'}`} 
-             style={{ backgroundColor: colors[type] || '#eee', ringColor: border[type] }}>
-          {type === 'female' ? <Heart size={28} color="#F472B6" /> : type === 'male' ? <Activity size={28} color="#10B981" /> : <Users size={28} color="#38BDF8" />}
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer ${selected ? 'ring-4 ring-pink-400 scale-110' : 'opacity-40 grayscale'}`} 
+             style={{ backgroundColor: colors[type] }}>
+          {icons[type]}
         </div>
       );
     };
 
     const App = () => {
-      const [currentPage, setCurrentPage] = useState('intro');
+      const [step, setStep] = useState('intro');
       const [scores, setScores] = useState({});
-      const [nebulaData, setNebulaData] = useState({ q1: 5, q8: '', nickname: '', avatar: 'female' });
+      const [data, setData] = useState({ pressure: 5, disease: '', nickname: '', avatar: 'female' });
       const [showConsult, setShowConsult] = useState(false);
 
-      const isAssessmentComplete = useMemo(() => Object.keys(scores).length === questions.length, [scores]);
+      const isComplete = useMemo(() => Object.keys(scores).length === 6, [scores]);
 
       const handleRestart = () => {
         setScores({});
-        setCurrentPage('intro');
+        setStep('intro');
         setShowConsult(false);
       };
 
       return (
-        <div className="min-h-screen pb-10">
+        <div className="min-h-screen font-sans">
+          {/* Header */}
           <header className="fixed top-0 inset-x-0 h-16 bg-white shadow-sm flex items-center justify-center z-50">
-            <h1 className="text-xl font-black text-pink-500">星雲計畫 | 照護指南</h1>
+             <img src="https://www.ilong-termcare.com/uploads/photos/shares/articles-content/%E6%98%9F%E9%9B%B2%E8%A8%88%E7%95%ABLOGO.png" className="h-8" alt="Logo" />
           </header>
 
-          <main className="max-w-md mx-auto px-4 pt-20">
-            {currentPage === 'intro' && (
-              <div className="text-center space-y-8 animate-in mt-10">
-                <div className="bg-white p-10 rounded-[40px] shadow-xl border-b-8 border-pink-100">
-                  <div className="w-20 h-20 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Heart className="text-pink-400" size={40} />
+          <main className="max-w-md mx-auto px-5 pt-24 pb-10">
+            {step === 'intro' && (
+              <div className="animate-in text-center space-y-8">
+                <div className="bg-white p-10 rounded-[48px] shadow-xl border-b-8 border-pink-100">
+                  <div className="w-24 h-24 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-8 animate-float">
+                    <Heart className="text-pink-400" size={48} />
                   </div>
-                  <h2 className="text-2xl font-black text-gray-800 mb-2">照顧不再孤軍奮戰</h2>
-                  <p className="text-gray-500 font-medium leading-relaxed">這是一份給照顧者的專屬導航<br/>協助您理清思緒，找回生活節奏</p>
-                  <button onClick={() => setCurrentPage('assessment')} className="w-full mt-10 py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg active:scale-95 transition-all">
-                    立即開始自評
+                  <h1 className="text-3xl font-black text-gray-800 mb-4">照顧指南速成工具</h1>
+                  <p className="text-gray-500 font-bold leading-relaxed">給自己的安心指引<br/>找回生活平衡的專屬報告</p>
+                  <button onClick={() => setStep('quiz')} className="w-full mt-10 py-5 bg-pink-500 text-white rounded-full font-black text-xl shadow-lg active:scale-95 transition-all">
+                    開始分析
                   </button>
                 </div>
               </div>
             )}
 
-            {currentPage === 'assessment' && (
+            {step === 'quiz' && (
               <div className="space-y-4 animate-in">
-                <div className="text-center mb-6">
-                  <h3 className="font-black text-gray-800 text-lg">照護三力評析</h3>
-                  <p className="text-sm text-gray-400 font-bold">1 分：完全不符合 ｜ 5 分：非常符合</p>
-                </div>
+                <h2 className="text-center font-black text-gray-400 mb-6 uppercase tracking-widest">照護三力自評</h2>
                 {questions.map(q => (
-                  <div key={q.id} className="bg-white p-5 rounded-3xl border-2 border-pink-50 shadow-sm">
-                    <p className="font-bold text-gray-700 mb-4 leading-tight">{q.text}</p>
+                  <div key={q.id} className="bg-white p-6 rounded-3xl border-2 border-pink-50 shadow-sm">
+                    <p className="font-bold text-gray-700 mb-6 text-lg">{q.text}</p>
                     <div className="flex justify-between items-center">
                       {[1, 2, 3, 4, 5].map(n => (
                         <button key={n} onClick={() => setScores({...scores, [q.id]: n})} 
-                          className={`w-11 h-11 rounded-full font-bold transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110' : 'bg-gray-50 text-gray-400'}`}>
+                          className={`w-12 h-12 rounded-full font-black transition-all ${scores[q.id] === n ? 'bg-pink-500 text-white scale-110 shadow-md' : 'bg-gray-50 text-gray-300'}`}>
                           {n}
                         </button>
                       ))}
                     </div>
                   </div>
                 ))}
-                <button disabled={!isAssessmentComplete} onClick={() => setCurrentPage('nebula')} 
-                  className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg mt-6 disabled:opacity-50">
+                <button disabled={!isComplete} onClick={() => setStep('info')} className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-xl shadow-lg mt-6 disabled:opacity-50">
                   下一步
                 </button>
               </div>
             )}
 
-            {currentPage === 'nebula' && (
+            {step === 'info' && (
               <div className="space-y-6 animate-in">
-                <div className="bg-white p-8 rounded-[32px] shadow-lg border-2 border-pink-50">
-                  <h3 className="font-black text-lg mb-8 text-center text-pink-600">基本資料設定</h3>
-                  <div className="space-y-6">
+                <div className="bg-white p-8 rounded-[40px] shadow-lg border-2 border-pink-50">
+                  <h2 className="text-center font-black text-xl mb-8 text-pink-500">基本資料填寫</h2>
+                  <div className="space-y-8">
                     <div>
-                      <label className="block text-sm font-black text-gray-400 mb-4 uppercase tracking-wider">目前壓力指數 ({nebulaData.q1})</label>
-                      <input type="range" min="1" max="10" value={nebulaData.q1} onChange={e => setNebulaData({...nebulaData, q1: parseInt(e.target.value)})} className="pressure-slider" />
+                      <label className="block text-sm font-black text-gray-400 mb-4 uppercase tracking-widest">目前壓力指數 ({data.pressure})</label>
+                      <input type="range" min="1" max="10" value={data.pressure} onChange={e => setData({...data, pressure: parseInt(e.target.value)})} className="pressure-slider" />
                     </div>
-                    <select value={nebulaData.q8} onChange={e => setNebulaData({...nebulaData, q8: e.target.value})} className="w-full p-4 rounded-xl border-2 bg-gray-50 font-bold focus:border-pink-300 outline-none">
+                    <select value={data.disease} onChange={e => setData({...data, disease: e.target.value})} className="w-full p-4 rounded-2xl border-2 bg-gray-50 font-bold outline-none focus:border-pink-300">
                       <option value="">主要疾病狀況</option>
-                      {['失智症', '中風', '癌症', '老化衰弱', '其他'].map(d => <option key={d} value={d}>{d}</option>)}
+                      {['失智症', '中風', '糖尿病', '老化衰弱', '癌症'].map(d => <option key={d} value={d}>{d}</option>)}
                     </select>
-                    <input type="text" placeholder="您的暱稱" value={nebulaData.nickname} onChange={e => setNebulaData({...nebulaData, nickname: e.target.value})} className="w-full p-4 rounded-xl border-2 bg-gray-50 font-bold focus:border-pink-300 outline-none" />
+                    <input type="text" placeholder="您的暱稱" value={data.nickname} onChange={e => setData({...data, nickname: e.target.value})} className="w-full p-4 rounded-2xl border-2 bg-gray-50 font-bold outline-none focus:border-pink-300" />
                     <div className="flex justify-around pt-6 border-t border-dashed">
                       {['female', 'neutral', 'male'].map(a => (
-                        <button key={a} onClick={() => setNebulaData({...nebulaData, avatar: a})}><Avatar type={a} selected={nebulaData.avatar === a} /></button>
+                        <div key={a} onClick={() => setData({...data, avatar: a})}><Avatar type={a} selected={data.avatar === a} /></div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <button disabled={!nebulaData.nickname || !nebulaData.q8} onClick={() => setCurrentPage('result')} className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-lg shadow-lg">
-                  查看分析報告
+                <button disabled={!data.nickname || !data.disease} onClick={() => setStep('result')} className="w-full py-5 bg-pink-500 text-white rounded-full font-black text-xl shadow-lg">
+                  生成我的報告
                 </button>
               </div>
             )}
 
-            {currentPage === 'result' && (
+            {step === 'result' && (
               <div className="animate-in pb-10">
-                <div id="result-card" className="bg-white p-8 rounded-[40px] shadow-2xl border-2 border-pink-50">
-                  <div className="text-center mb-8">
-                    <div className="inline-block p-1 rounded-full bg-pink-50 mb-4">
-                      <Avatar type={nebulaData.avatar} selected={true} />
-                    </div>
-                    <h2 className="text-2xl font-black">{nebulaData.nickname} 的照顧指南</h2>
-                    <p className="text-sm font-bold text-gray-400 mt-1">針對 {nebulaData.q8} 的照護建議</p>
+                <div id="result-card" className="bg-white p-8 rounded-[48px] shadow-2xl border-2 border-pink-50">
+                  <div className="text-center mb-10">
+                    <div className="inline-block"><Avatar type={data.avatar} selected={true} /></div>
+                    <h2 className="text-2xl font-black mt-6">{data.nickname} 的照顧指南</h2>
+                    <p className="text-sm font-bold text-gray-400 mt-1">疾病：{data.disease} | 壓力指數：{data.pressure}</p>
                   </div>
 
                   <div className="space-y-6">
                     <div className="p-6 bg-pink-50 rounded-3xl border-l-8 border-pink-400">
-                      <h4 className="font-black text-pink-600 mb-2 flex items-center gap-2 underline decoration-pink-200 decoration-4">核心觀察</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed font-medium">目前您的壓力指數為 {nebulaData.q1} 分。在面對 {nebulaData.q8} 的過程中，覺察自己的極限是最重要的第一步。這份報告顯示您具備基礎的知識力，但在支持系統的建立上仍有進步空間。</p>
+                      <h3 className="font-black text-pink-600 mb-2">重點分析</h3>
+                      <p className="text-sm text-gray-700 leading-relaxed font-medium">針對您目前面對 {data.disease} 的壓力狀況，建議建立「清單式求助」。在支持力部分，您目前的表現反映出需要更多的喘息機會。這份報告已為您初步鎖定資源對策。</p>
                     </div>
 
-                    <div className="p-6 bg-blue-50 rounded-3xl border-l-8 border-blue-400">
-                      <h4 className="font-black text-blue-600 mb-2">專屬對策</h4>
-                      <ul className="text-sm text-gray-600 space-y-3 font-medium">
-                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0"/> 建立「具體求助清單」，讓家人知道如何分擔。</li>
-                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0"/> 善用長照 1966 專線，媒合喘息服務。</li>
-                      </ul>
-                    </div>
-
-                    <div className="bg-slate-800 p-8 rounded-[32px] text-center text-white shadow-xl no-print">
+                    <div className="bg-slate-900 p-8 rounded-[40px] text-center text-white no-print">
                       <Star className="mx-auto mb-4 text-yellow-400 fill-yellow-400" />
-                      <p className="font-black text-lg mb-6 leading-tight">想與專家聊聊<br/>您的具體照護困境嗎？</p>
-                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-white text-slate-800 rounded-full font-black flex items-center justify-center gap-2 hover:bg-pink-50 transition-colors">
+                      <p className="font-black text-lg mb-6 leading-tight">解鎖專屬您的<br/>具體行動方案</p>
+                      <button onClick={() => setShowConsult(true)} className="w-full py-4 bg-white text-slate-900 rounded-full font-black flex items-center justify-center gap-2">
                         <MessageSquare size={18} /> 預約照顧管家諮詢
                       </button>
                     </div>
                   </div>
 
-                  <div className="mt-10 pt-8 border-t border-gray-100 no-print flex gap-3">
+                  <div className="mt-10 pt-8 border-t border-gray-100 no-print flex gap-4">
                     <button onClick={handleRestart} className="flex-1 py-4 border-2 border-pink-500 text-pink-500 rounded-full font-black text-sm">重新檢測</button>
-                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-full font-black text-sm flex items-center justify-center gap-2"><Download size={16}/> 下載 PDF</button>
+                    <button onClick={() => window.print()} className="flex-1 py-4 bg-gray-100 text-gray-700 rounded-full font-black text-sm flex items-center justify-center gap-2"><Download size={16}/> 下載報告</button>
                   </div>
                 </div>
 
                 {showConsult && (
                   <div className="mt-10 animate-in no-print">
-                    <div className="bg-pink-50 p-4 rounded-t-[32px] text-center">
-                      <p className="text-xs font-black text-pink-400">正在加載諮詢表單...</p>
-                    </div>
+                    <div className="bg-pink-100 p-4 rounded-t-[32px] text-center"><p className="text-xs font-black text-pink-500 uppercase tracking-widest">預約表單載入中</p></div>
                     <iframe src="https://www.surveycake.com/s/P8Aza" className="w-full h-[600px] rounded-b-[32px] border-4 border-pink-50 shadow-inner" />
                   </div>
                 )}
